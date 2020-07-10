@@ -102,8 +102,8 @@ public class DelayedProxy implements Delayed, Externalizable {
 	public int compareTo(Delayed o) {
 		DelayedProxy that = (DelayedProxy) o;
 		return new CompareToBuilder()
-			.append(this.proxy, that.proxy)
 			.append(this.availableTime, that.availableTime)
+			.append(this.proxy.toURI(), that.proxy.toURI())
 			.toComparison();
 	}
 
