@@ -110,8 +110,8 @@ public class DelayedProxy implements Delayed, Externalizable {
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder(17, 37)
-			.append(this.proxy)
 			.append(this.availableTime)
+			.append(this.proxy.toURI())
 			.toHashCode();
 	}
 
@@ -128,8 +128,8 @@ public class DelayedProxy implements Delayed, Externalizable {
 		}
 		DelayedProxy that = (DelayedProxy) obj;
 		return new EqualsBuilder()
-			.append(this.proxy, that.proxy)
 			.append(this.availableTime, that.availableTime)
+			.append(this.proxy.toURI(), that.proxy.toURI())
 			.isEquals();
 	}
 
