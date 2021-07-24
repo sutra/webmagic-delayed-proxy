@@ -24,12 +24,10 @@
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
-			<version>2.14.1</version>
 		</dependency>
 		<dependency>
 			<groupId>us.codecraft</groupId>
 			<artifactId>webmagic-core</artifactId>
-			<version>0.7.5</version>
 			<exclusions>
 				<exclusion>
 					<groupId>commons-collections</groupId>
@@ -42,6 +40,20 @@
 			</exclusions>
 		</dependency>
 	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-api</artifactId>
+				<version>2.14.1</version>
+			</dependency>
+			<dependency>
+				<groupId>us.codecraft</groupId>
+				<artifactId>webmagic-core</artifactId>
+				<version>0.7.5</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<scm>
 		<connection>scm:git:git@github.com:sutra/webmagic-delayed-proxy.git</connection>
 		<developerConnection>scm:git:git@github.com:sutra/webmagic-delayed-proxy.git</developerConnection>
