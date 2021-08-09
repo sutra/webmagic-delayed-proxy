@@ -19,7 +19,7 @@ import us.codecraft.webmagic.proxy.Proxy;
 
 public class DelayedProxy implements Delayed, Externalizable {
 
-	private Proxy proxy;
+	private transient Proxy proxy;
 
 	private Instant availableTime;
 

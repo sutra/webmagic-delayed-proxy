@@ -26,15 +26,19 @@ import us.codecraft.webmagic.proxy.ProxyProvider;
 
 public class DelayedProxyProvider implements ProxyProvider, Externalizable {
 
-	private final Logger log = LogManager.getLogger();
+	private final transient Logger log = LogManager.getLogger();
 
-	private final DelayQueue<DelayedProxy> proxies;
+	private final transient DelayQueue<DelayedProxy> proxies;
 
-	private final Map<Proxy, DelayedProxy> allProxies;
+	private final transient Map<Proxy, DelayedProxy> allProxies;
 
-	private long minSuccessDelay, maxSuccessDelay;
+	private long minSuccessDelay;
 
-	private long minFailureDelay, maxFailureDelay;
+	private long maxSuccessDelay;
+
+	private long minFailureDelay;
+
+	private long maxFailureDelay;
 
 	public DelayedProxyProvider() {
 		this(Duration.ZERO, Duration.ZERO, Duration.ZERO, Duration.ZERO);
@@ -84,6 +88,7 @@ public class DelayedProxyProvider implements ProxyProvider, Externalizable {
 		try {
 			return this.proxies.take().getProxy();
 		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
 			throw new IllegalStateException(e);
 		}
 	}
@@ -133,7 +138,8 @@ public class DelayedProxyProvider implements ProxyProvider, Externalizable {
 	}
 
 	protected Duration getDelay(DelayedProxy delayedProxy, Page page, Task task, boolean success) {
-		final long minDelay, maxDelay;
+		final long minDelay;
+		final long maxDelay;
 
 		if (success) {
 			minDelay = this.minSuccessDelay;
@@ -148,9 +154,9 @@ public class DelayedProxyProvider implements ProxyProvider, Externalizable {
 		final Duration delay = Duration.ofMillis((long) amount);
 
 		log.trace("Proxy: {}, success count: {}, failure count: {}, delayFactor: {} delay: {}",
-			() -> delayedProxy.getProxy(),
-			() -> delayedProxy.getSuccessCount(),
-			() -> delayedProxy.getFailureCount(),
+			delayedProxy::getProxy,
+			delayedProxy::getSuccessCount,
+			delayedProxy::getFailureCount,
 			() -> delayFactor,
 			() -> delay
 		);
@@ -161,8 +167,7 @@ public class DelayedProxyProvider implements ProxyProvider, Externalizable {
 	protected float getDelayFactor(DelayedProxy delayedProxy, Page page, Task task, boolean success) {
 		final long totalCount = delayedProxy.getSuccessCount() + delayedProxy.getFailureCount();
 		final float failureRate = totalCount != 0 ? (float) delayedProxy.getFailureCount() / (float) totalCount : 0;
-		final float delayFactor = 1 + failureRate * delayedProxy.getFailureCount();
-		return delayFactor;
+		return 1 + failureRate * delayedProxy.getFailureCount();
 	}
 
 	protected boolean isSuccess(Proxy proxy, Page page, Task task) {
@@ -175,7 +180,7 @@ public class DelayedProxyProvider implements ProxyProvider, Externalizable {
 
 	protected void printInfo() {
 		if (log.isTraceEnabled()) {
-			String prefix = String.format("%1$32s\t%2$32s\t%3$8s\t%4$8s\t%5$16s" + System.lineSeparator(), "Proxy", "Available Time", "Success", "Failure", "Delayed(ms)");
+			String prefix = String.format("%1$32s\t%2$32s\t%3$8s\t%4$8s\t%5$16s%6$s", "Proxy", "Available Time", "Success", "Failure", "Delayed(ms)", System.lineSeparator());
 			String stat = this.proxies.stream().sorted()
 				.map(p -> String.format("%1$32s\t%2$32s\t%3$8d\t%4$8d\t%5$16d", p.getProxy(), p.getAvailableTime(), p.getSuccessCount(), p.getFailureCount(), p.getDelay(TimeUnit.MILLISECONDS)))
 				.collect(Collectors.joining(System.lineSeparator(), prefix, ""));
