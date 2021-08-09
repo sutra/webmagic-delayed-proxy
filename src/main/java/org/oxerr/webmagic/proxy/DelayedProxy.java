@@ -19,7 +19,7 @@ import us.codecraft.webmagic.proxy.Proxy;
 
 public class DelayedProxy implements Delayed, Externalizable {
 
-	private Proxy proxy;
+	private transient Proxy proxy;
 
 	private Instant availableTime;
 
@@ -102,16 +102,16 @@ public class DelayedProxy implements Delayed, Externalizable {
 	public int compareTo(Delayed o) {
 		DelayedProxy that = (DelayedProxy) o;
 		return new CompareToBuilder()
-			.append(this.proxy, that.proxy)
 			.append(this.availableTime, that.availableTime)
+			.append(this.proxy.toURI(), that.proxy.toURI())
 			.toComparison();
 	}
 
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder(17, 37)
-			.append(this.proxy)
 			.append(this.availableTime)
+			.append(this.proxy.toURI())
 			.toHashCode();
 	}
 
@@ -128,8 +128,8 @@ public class DelayedProxy implements Delayed, Externalizable {
 		}
 		DelayedProxy that = (DelayedProxy) obj;
 		return new EqualsBuilder()
-			.append(this.proxy, that.proxy)
 			.append(this.availableTime, that.availableTime)
+			.append(this.proxy.toURI(), that.proxy.toURI())
 			.isEquals();
 	}
 
