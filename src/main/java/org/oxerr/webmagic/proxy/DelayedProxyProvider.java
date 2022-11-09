@@ -40,6 +40,8 @@ public class DelayedProxyProvider implements ProxyProvider, Externalizable {
 
 	private long maxFailureDelay;
 
+	private long waitTimeout;
+
 	public DelayedProxyProvider() {
 		this(Duration.ZERO, Duration.ZERO, Duration.ZERO, Duration.ZERO);
 	}
@@ -49,6 +51,22 @@ public class DelayedProxyProvider implements ProxyProvider, Externalizable {
 		Duration maxSuccessDelay,
 		Duration minFailureDelay,
 		Duration maxFailureDelay
+	) {
+		this(
+			minSuccessDelay,
+			maxSuccessDelay,
+			minFailureDelay,
+			maxFailureDelay,
+			Duration.ZERO
+		);
+	}
+
+	public DelayedProxyProvider(
+		Duration minSuccessDelay,
+		Duration maxSuccessDelay,
+		Duration minFailureDelay,
+		Duration maxFailureDelay,
+		Duration waitTimeout
 	) {
 		this.proxies = new DelayQueue<>();
 		this.allProxies = new HashMap<>();
@@ -60,6 +78,8 @@ public class DelayedProxyProvider implements ProxyProvider, Externalizable {
 
 		this.minFailureDelay = unit.convert(minFailureDelay);
 		this.maxFailureDelay = unit.convert(maxFailureDelay);
+
+		this.waitTimeout = unit.convert(waitTimeout);
 	}
 
 	@Override
@@ -83,14 +103,26 @@ public class DelayedProxyProvider implements ProxyProvider, Externalizable {
 
 	@Override
 	public Proxy getProxy(Task task) {
+		final Proxy proxy;
+
 		this.printInfo();
 
 		try {
-			return this.proxies.take().getProxy();
+			if (this.waitTimeout > 0) {
+				proxy = this.proxies.poll(this.waitTimeout, TimeUnit.MILLISECONDS).getProxy();
+
+				if (proxy == null) {
+					log.warn("Wait for proxy timed out.");
+				}
+			} else {
+				proxy = this.proxies.take().getProxy();
+			}
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 			throw new IllegalStateException(e);
 		}
+
+		return proxy;
 	}
 
 	public synchronized void put(Proxy proxy) {
