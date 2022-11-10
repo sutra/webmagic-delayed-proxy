@@ -109,10 +109,13 @@ public class DelayedProxyProvider implements ProxyProvider, Externalizable {
 
 		try {
 			if (this.waitTimeout > 0) {
-				proxy = this.proxies.poll(this.waitTimeout, TimeUnit.MILLISECONDS).getProxy();
+				DelayedProxy dp = this.proxies.poll(this.waitTimeout, TimeUnit.MILLISECONDS);
 
-				if (proxy == null) {
+				if (dp != null) {
+					proxy = dp.getProxy();
+				} else {
 					log.warn("Wait for proxy timed out.");
+					proxy = null;
 				}
 			} else {
 				proxy = this.proxies.take().getProxy();
