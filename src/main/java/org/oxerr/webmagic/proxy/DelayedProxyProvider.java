@@ -85,6 +85,11 @@ public class DelayedProxyProvider implements ProxyProvider, Externalizable {
 	@Override
 	public void returnProxy(Proxy proxy, Page page, Task task) {
 		final DelayedProxy delayedProxy = this.allProxies.get(proxy);
+
+		if (delayedProxy == null) {
+			throw new IllegalArgumentException(String.format("No %s found.", proxy));
+		}
+
 		final boolean success = this.isSuccess(proxy, page, task);
 
 		if (success) {
