@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -87,7 +88,7 @@ public class DelayedProxyProvider implements ProxyProvider, Externalizable {
 		final DelayedProxy delayedProxy = this.allProxies.get(proxy);
 
 		if (delayedProxy == null) {
-			throw new IllegalArgumentException(String.format("No %s found.", proxy));
+			throw new NoSuchElementException(String.format("No %s found.", proxy));
 		}
 
 		final boolean success = this.isSuccess(proxy, page, task);
