@@ -21,6 +21,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import us.codecraft.webmagic.Page;
+import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Task;
 import us.codecraft.webmagic.proxy.Proxy;
 import us.codecraft.webmagic.proxy.ProxyProvider;
@@ -108,7 +109,7 @@ public class DelayedProxyProvider implements ProxyProvider, Externalizable {
 	}
 
 	@Override
-	public Proxy getProxy(Task task) {
+	public Proxy getProxy(Request request, Task task) {
 		final Proxy proxy;
 
 		this.printInfo();
