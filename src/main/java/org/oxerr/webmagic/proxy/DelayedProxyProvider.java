@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -20,6 +21,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import us.codecraft.webmagic.Page;
+import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Task;
 import us.codecraft.webmagic.proxy.Proxy;
 import us.codecraft.webmagic.proxy.ProxyProvider;
@@ -87,7 +89,7 @@ public class DelayedProxyProvider implements ProxyProvider, Externalizable {
 		final DelayedProxy delayedProxy = this.allProxies.get(proxy);
 
 		if (delayedProxy == null) {
-			throw new IllegalArgumentException(String.format("No %s found.", proxy));
+			throw new NoSuchElementException(String.format("No %s found.", proxy));
 		}
 
 		final boolean success = this.isSuccess(proxy, page, task);
@@ -107,7 +109,7 @@ public class DelayedProxyProvider implements ProxyProvider, Externalizable {
 	}
 
 	@Override
-	public Proxy getProxy(Task task) {
+	public Proxy getProxy(Request request, Task task) {
 		final Proxy proxy;
 
 		this.printInfo();

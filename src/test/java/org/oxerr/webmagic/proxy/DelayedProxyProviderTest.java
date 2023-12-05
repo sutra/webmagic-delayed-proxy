@@ -25,7 +25,7 @@ class DelayedProxyProviderTest {
 	void testReturnProxy() {
 		var task = mock(Task.class);
 		var page = mock(Page.class);
-		var proxy = this.provider.getProxy(task);
+		var proxy = this.provider.getProxy(null, task);
 		assertEquals(1, this.provider.getAllProxies().size());
 		assertEquals(0, this.provider.getProxies().size());
 		this.provider.returnProxy(proxy, page, task);
@@ -35,7 +35,7 @@ class DelayedProxyProviderTest {
 
 	@Test
 	void testGetProxy() {
-		var proxy = provider.getProxy(null);
+		var proxy = provider.getProxy(null, null);
 		assertEquals(new Proxy("127.0.0.1", 3128), proxy);
 	}
 
